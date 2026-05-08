@@ -188,6 +188,86 @@ terraform.tfvars
 terraform.tfvars.json
 
 # ============================================================
+# C++ BUILD ARTIFACTS
+# ============================================================
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CMakeScripts/
+CTestTestfile.cmake
+_deps/
+*.o
+*.obj
+*.a
+*.lib
+*.dll
+*.dylib
+*.so
+*.so.*
+Makefile
+cmake-build-*/
+compile_commands.json
+
+# ============================================================
+# PYTHON BACKEND SPECIFIC
+# ============================================================
+*.pyc
+instance/
+.webassets-cache
+celerybeat-schedule
+celerybeat.pid
+*.sage.py
+.ipynb_checkpoints
+profile_default/
+ipython_config.py
+pdm.lock
+__pypackages__/
+.pdm.toml
+.pdm-python
+.pdm-build/
+Pipfile.lock
+poetry.lock
+
+# ============================================================
+# ALEMBIC (keep migrations, ignore local config overrides)
+# ============================================================
+alembic.ini.local
+
+# ============================================================
+# NEXT.JS / FRONTEND SPECIFIC
+# ============================================================
+.next/
+.swc/
+next-env.d.ts
+*.tgz
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+storybook-static/
+.storybook/
+
+# ============================================================
+# DOCKER VOLUMES & LOCAL DATA
+# ============================================================
+postgres-data/
+redis-data/
+data/
+volumes/
+docker-compose.override.yml
+
+# ============================================================
+# TESTING & COVERAGE
+# ============================================================
+.coverage
+coverage.xml
+test-results/
+junit.xml
+*.lcov
+
+# ============================================================
 # MISCELLANEOUS
 # ============================================================
 *.bak
