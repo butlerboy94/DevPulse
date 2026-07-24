@@ -217,9 +217,9 @@ Full interactive API documentation available at `/docs` (Swagger UI) when runnin
 ## Roadmap
 
 - [x] Project setup and architecture
-- [ ] **Phase 1** — Initialize monorepo, Docker, FastAPI and Next.js skeletons
-- [ ] **Phase 2** — C++ benchmarking engine with pybind11 bindings
-- [ ] **Phase 3** — Python backend, static analysis, AI integration, database
+- [x] **Phase 1** — Initialize monorepo, Docker, FastAPI and Next.js skeletons
+- [x] **Phase 2** — C++ benchmarking engine with pybind11 bindings
+- [x] **Phase 3** — Python backend, static analysis, AI integration, database
 - [ ] **Phase 4** — Frontend: code editor, dashboard, auth, charts
 - [ ] **Phase 5** — CI/CD pipeline, cloud deployment, live demo URL
 
