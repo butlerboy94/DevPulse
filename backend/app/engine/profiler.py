@@ -3,8 +3,8 @@ from __future__ import annotations
 import cProfile
 import io
 import pstats
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable, List
 
 
 @dataclass
@@ -24,7 +24,7 @@ class ProfileReport:
     total_time_ms: float
     function_count: int        # number of distinct functions called
     total_call_count: int      # total number of function calls made
-    hotspots: List[ProfileEntry] = field(default_factory=list)  # top N slowest
+    hotspots: list[ProfileEntry] = field(default_factory=list)  # top N slowest
 
     @property
     def top_hotspot(self) -> ProfileEntry | None:
@@ -76,10 +76,10 @@ class CodeProfiler:
         # pstats.Stats stores raw data in .stats:
         # key   = (filename, line_number, function_name)
         # value = (call_count, non_recursive_calls, total_time_sec, cumulative_time_sec, ...)
-        entries: List[ProfileEntry] = []
+        entries: list[ProfileEntry] = []
         total_calls = 0
 
-        for (filename, lineno, funcname), (cc, nc, tt, ct, _) in stats.stats.items():
+        for (filename, lineno, funcname), (cc, _nc, tt, ct, _) in stats.stats.items():
             total_calls += cc
             entries.append(ProfileEntry(
                 function_name=funcname,
