@@ -1,3 +1,6 @@
+## Template Alembic fills in every time you run `alembic revision
+## --autogenerate -m "..."` — this is what a new migration file under
+## alembic/versions/ starts from. You won't normally edit this file directly.
 """${message}
 
 Revision ID: ${up_revision}

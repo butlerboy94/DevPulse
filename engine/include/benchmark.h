@@ -1,3 +1,7 @@
+// Public interface of the C++ benchmarking engine: the BenchmarkResult
+// struct, the benchmark_callable() timing template, and the two helper
+// functions implemented in benchmark.cpp. Exposed to Python via
+// bindings/bindings.cpp.
 #pragma once
 
 #include <algorithm>

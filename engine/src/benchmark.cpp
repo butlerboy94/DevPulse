@@ -1,3 +1,7 @@
+// Implements the two non-template helpers declared in benchmark.h:
+// get_memory_usage() (cross-platform current process memory) and
+// detect_loop_depth() (nested-loop counter). benchmark_callable() itself is
+// a template and lives entirely in the header.
 #include "benchmark.h"
 
 #include <algorithm>
@@ -14,6 +18,9 @@
 
 namespace devpulse {
 
+// Returns the current process's resident memory in bytes, or -1 if it
+// couldn't be read. Implementation differs per OS since there's no portable
+// standard-library way to ask for this.
 long long get_memory_usage() {
 #if defined(_WIN32)
     PROCESS_MEMORY_COUNTERS pmc;
@@ -45,6 +52,9 @@ long long get_memory_usage() {
 #endif
 }
 
+// Walks a list of keyword tokens (e.g. ["for", "while", "end_loop",
+// "end_loop"]) and returns the deepest point loops were nested inside each
+// other.
 int detect_loop_depth(const std::vector<std::string>& tokens) {
     int max_depth     = 0;
     int current_depth = 0;

@@ -1,3 +1,6 @@
+// pybind11 glue that exposes the C++ engine (benchmark.h/.cpp) to Python as
+// the `devpulse_engine` module. This is the only file that knows both C++
+// and Python calling conventions — everything else in engine/ is plain C++.
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 

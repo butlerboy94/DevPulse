@@ -1,5 +1,9 @@
+// Root layout — wraps every page in the app. Mounts the Navbar once here so
+// it doesn't need to be re-added to each page, and sets the browser tab
+// title/description.
 import type { Metadata } from "next";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "DevPulse — Code Performance Analysis",
@@ -9,7 +13,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }

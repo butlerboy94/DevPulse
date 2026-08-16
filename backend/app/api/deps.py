@@ -1,3 +1,5 @@
+# FastAPI dependencies for reading the logged-in user off the request's JWT.
+# Used by endpoint functions as `current_user: User = Depends(get_current_user)`.
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -32,6 +34,8 @@ def get_current_user_optional(
     return _resolve_user(token, db)
 
 
+# Shared lookup used by both dependencies above: decode the token (if any)
+# and fetch the matching user row.
 def _resolve_user(token: str | None, db: Session) -> User | None:
     if not token:
         return None

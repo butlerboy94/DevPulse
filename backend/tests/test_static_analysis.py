@@ -1,3 +1,5 @@
+# Tests for the ast-based StaticAnalyzer (services/static_analysis.py):
+# complexity scoring, naming checks, unused-variable detection.
 from app.services.static_analysis import StaticAnalyzer
 
 

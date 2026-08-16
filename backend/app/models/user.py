@@ -1,3 +1,4 @@
+# SQLAlchemy model for the "users" table — a registered account.
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String

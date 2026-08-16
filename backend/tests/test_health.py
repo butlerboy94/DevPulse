@@ -1,3 +1,4 @@
+# Sanity-check tests for the root "/" route and the /api/v1/health endpoint.
 from fastapi.testclient import TestClient
 
 from app.main import app

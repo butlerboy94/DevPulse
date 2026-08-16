@@ -1,3 +1,5 @@
+# Business logic behind sign-up and login — kept separate from the HTTP
+# layer (api/v1/endpoints/auth.py) so it can be tested and reused on its own.
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password, verify_password
@@ -12,6 +14,8 @@ class UsernameAlreadyTaken(Exception):
     pass
 
 
+# Creates a new user row, hashing the password first. Raises if the email or
+# username is already taken.
 def register_user(db: Session, email: str, username: str, password: str) -> User:
     if db.query(User).filter(User.email == email).first():
         raise EmailAlreadyRegistered
@@ -25,6 +29,8 @@ def register_user(db: Session, email: str, username: str, password: str) -> User
     return user
 
 
+# Looks up a user by email and checks their password. Returns None (never
+# raises) on any failure, so the caller can't leak whether the email exists.
 def authenticate_user(db: Session, email: str, password: str) -> User | None:
     user = db.query(User).filter(User.email == email).first()
     if user is None or not verify_password(password, user.hashed_password):

@@ -1,3 +1,4 @@
+// Landing page ("/") — just a hero and a call-to-action button into /analyze.
 export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 text-white px-4">

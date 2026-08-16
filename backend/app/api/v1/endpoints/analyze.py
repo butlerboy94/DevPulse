@@ -1,3 +1,5 @@
+# Core analysis HTTP endpoints: submit code, fetch a past result, and list
+# a user's history. Actual pipeline logic lives in analysis_service.py.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 

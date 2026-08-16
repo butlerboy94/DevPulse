@@ -1,3 +1,6 @@
+# SQLAlchemy model for the "analyses" table — one row per code submission,
+# holding the source code plus every result the pipeline produces
+# (benchmark, static analysis, AI recommendations).
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, JSON, String, Text

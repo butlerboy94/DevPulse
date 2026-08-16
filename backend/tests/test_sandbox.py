@@ -1,3 +1,5 @@
+# Tests for the subprocess-based code sandbox (services/sandbox.py):
+# successful runs, crashes, timeouts, and syntax errors.
 from app.services.sandbox import run_python_sandbox
 
 

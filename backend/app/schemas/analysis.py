@@ -1,15 +1,20 @@
+# Pydantic request/response schemas for the analysis endpoints — the "order
+# forms" and "receipts" FastAPI validates every /analyze, /results, and
+# /history request/response against.
 from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
+# Body of POST /analyze.
 class AnalyzeRequest(BaseModel):
     language: str = Field(default="python", description="Programming language of the submitted code")
     source_code: str = Field(min_length=1, max_length=20_000)
     iterations: int = Field(default=5, ge=1, le=50, description="How many timed runs to average")
 
 
+# Full response shape for POST /analyze and GET /results/{id}.
 class AnalysisOut(BaseModel):
     id: int
     language: str
@@ -30,6 +35,7 @@ class AnalysisOut(BaseModel):
         from_attributes = True
 
 
+# Trimmed-down response shape for each row of GET /history.
 class AnalysisHistoryItem(BaseModel):
     id: int
     language: str

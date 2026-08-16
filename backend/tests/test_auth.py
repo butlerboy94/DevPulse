@@ -1,3 +1,5 @@
+# Tests for POST /auth/register and POST /auth/login (registration,
+# duplicate-email/username rejection, login success/failure).
 def test_register_new_user(client):
     response = client.post(
         "/api/v1/auth/register",

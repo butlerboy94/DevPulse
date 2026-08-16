@@ -1,3 +1,5 @@
+/* Global stylesheet, imported once in app/layout.tsx. Pulls in Tailwind's
+   base/components/utilities layers, then sets the app-wide dark theme. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

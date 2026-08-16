@@ -1,3 +1,5 @@
+# Tests for the /analyze, /results/{id}, and /history endpoints — the full
+# pipeline wired through the HTTP layer.
 SIMPLE_CODE = "def add(a, b):\n    return a + b\n\nprint(add(2, 3))\n"
 
 

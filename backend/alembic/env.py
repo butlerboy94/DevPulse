@@ -1,3 +1,7 @@
+# Alembic's entry point — run via `alembic revision --autogenerate` (to
+# create a new migration) or `alembic upgrade head` (to apply migrations).
+# Points Alembic at the same database URL and model metadata the app itself
+# uses, so migrations always stay in sync with app/models/.
 import os
 import sys
 from logging.config import fileConfig
@@ -21,6 +25,8 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 
+# Generates the raw SQL without a live DB connection (`alembic upgrade
+# --sql`), for review or manual application.
 def run_migrations_offline() -> None:
     url = config.get_main_option("sqlalchemy.url")
     context.configure(url=url, target_metadata=target_metadata,
@@ -29,6 +35,7 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+# The normal path — connects to the real database and applies migrations directly.
 def run_migrations_online() -> None:
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),

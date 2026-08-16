@@ -1,3 +1,5 @@
+# Auth HTTP endpoints — thin wrappers around auth_service.py's business
+# logic. POST /api/v1/auth/register and POST /api/v1/auth/login.
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -18,6 +20,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register(payload: UserCreate, db: Session = Depends(get_db)):
+    # Business rules (duplicate email/username) live in auth_service.py; this
+    # layer just translates them into the right HTTP status codes.
     try:
         user = register_user(db, payload.email, payload.username, payload.password)
     except EmailAlreadyRegistered:

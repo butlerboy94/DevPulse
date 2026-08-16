@@ -1,3 +1,6 @@
+// Tailwind CSS configuration — tells Tailwind which files to scan for class
+// names (so unused styles get purged) and defines the custom "brand" color
+// scale available as e.g. bg-brand-500.
 import type { Config } from "tailwindcss";
 
 const config: Config = {
