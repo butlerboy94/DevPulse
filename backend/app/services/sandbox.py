@@ -1,12 +1,26 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+# subprocess.run() hands the child process a full copy of this process's
+# environment by default — which would include JWT_SECRET_KEY, DATABASE_URL,
+# and ANTHROPIC_API_KEY, all trivially readable from submitted code via
+# `os.environ`. The sandbox only gets this short allow-list instead: just
+# enough for the Python interpreter itself to start up on Windows/Linux/macOS.
+_SANDBOX_ENV_ALLOWLIST = frozenset(
+    {"PATH", "SYSTEMROOT", "SYSTEMDRIVE", "TEMP", "TMP", "HOME", "LANG", "LC_ALL", "LC_CTYPE"}
+)
+
+
+def _minimal_subprocess_env() -> dict[str, str]:
+    return {key: value for key, value in os.environ.items() if key.upper() in _SANDBOX_ENV_ALLOWLIST}
 
 # The backend project root (the folder that contains the "app" package).
 # sandbox.py lives at app/services/sandbox.py, so two levels up is the root.
@@ -128,7 +142,9 @@ def run_python_sandbox(
     This is a *soft* sandbox appropriate for a portfolio/learning project,
     not a hard security boundary: it isolates the submitted code in its own
     process (so a crash or infinite loop can't take down the API server),
-    enforces a wall-clock timeout, and caps CPU time + memory on POSIX
+    enforces a wall-clock timeout, strips the process environment down to a
+    safe allow-list (so submitted code can't read JWT_SECRET_KEY,
+    DATABASE_URL, etc. via os.environ), and caps CPU time + memory on POSIX
     systems. It does not prevent filesystem or network access — a real
     production deployment would add OS-level sandboxing (containers,
     gVisor, seccomp) on top of this.
@@ -159,6 +175,7 @@ def run_python_sandbox(
                 text=True,
                 timeout=timeout_seconds,
                 cwd=tmp_dir,
+                env=_minimal_subprocess_env(),
             )
         except subprocess.TimeoutExpired:
             return SandboxResult(
