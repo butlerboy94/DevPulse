@@ -6,7 +6,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Latest-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Latest-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![C++](https://img.shields.io/badge/C++-C++17-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)](https://isocpp.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
@@ -101,11 +101,10 @@ Under the hood, DevPulse does four things simultaneously:
 ### Frontend
 | Technology | Role |
 |---|---|
-| **Next.js 14** | React framework with App Router, SSR, and file-based routing |
+| **Next.js 16** | React framework with App Router, SSR, and file-based routing |
 | **TypeScript** | Type-safe JavaScript — catches errors before they reach production |
 | **Tailwind CSS** | Utility-first styling for fast, responsive UI development |
 | **Monaco Editor** | The VS Code editor embedded as a React component |
-| **Recharts** | Performance data visualization (charts, gauges, graphs) |
 | **Axios** | HTTP client for all frontend-to-backend API calls |
 | **Zustand** | Lightweight global state management |
 
@@ -169,15 +168,18 @@ cd DevPulse
 ### 2. Set up environment variables
 ```bash
 # Copy the example env file (never commit the actual .env)
-cp backend/.env.example backend/.env
+cp .env.example .env
 ```
 
-Edit `backend/.env` and fill in your values:
+Edit `.env` (repo root — Docker Compose reads it for every service) and fill in your values:
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/devpulse
+DATABASE_URL=postgresql://devpulse:devpulse_local@localhost:5432/devpulse
 REDIS_URL=redis://localhost:6379
 ANTHROPIC_API_KEY=your_anthropic_api_key
 JWT_SECRET_KEY=your_secret_key
+JWT_ALGORITHM=HS256
+
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ### 3. Start all services with Docker
@@ -204,11 +206,11 @@ cmake -B build && cmake --build build
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/analyze` | Submit code for full analysis |
-| `GET` | `/results/{id}` | Retrieve a specific analysis result |
-| `GET` | `/history` | Get all past analyses for current user |
-| `POST` | `/auth/register` | Create a new user account |
-| `POST` | `/auth/login` | Log in and receive a JWT token |
+| `POST` | `/api/v1/analyze` | Submit code for full analysis |
+| `GET` | `/api/v1/results/{id}` | Retrieve a specific analysis result |
+| `GET` | `/api/v1/history` | Get all past analyses for current user |
+| `POST` | `/api/v1/auth/register` | Create a new user account |
+| `POST` | `/api/v1/auth/login` | Log in and receive a JWT token |
 
 Full interactive API documentation available at `/docs` (Swagger UI) when running locally.
 
@@ -220,7 +222,7 @@ Full interactive API documentation available at `/docs` (Swagger UI) when runnin
 - [x] **Phase 1** — Initialize monorepo, Docker, FastAPI and Next.js skeletons
 - [x] **Phase 2** — C++ benchmarking engine with pybind11 bindings
 - [x] **Phase 3** — Python backend, static analysis, AI integration, database
-- [ ] **Phase 4** — Frontend: code editor, dashboard, auth, charts
+- [x] **Phase 4** — Frontend: code editor, dashboard, auth, history (mobile nav polish still in progress)
 - [ ] **Phase 5** — CI/CD pipeline, cloud deployment, live demo URL
 
 ---
