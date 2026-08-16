@@ -15,12 +15,45 @@ from typing import Any
 # `os.environ`. The sandbox only gets this short allow-list instead: just
 # enough for the Python interpreter itself to start up on Windows/Linux/macOS.
 _SANDBOX_ENV_ALLOWLIST = frozenset(
-    {"PATH", "SYSTEMROOT", "SYSTEMDRIVE", "TEMP", "TMP", "HOME", "LANG", "LC_ALL", "LC_CTYPE"}
+    {"PATH", "SYSTEMROOT", "SYSTEMDRIVE", "TEMP", "TMP", "LANG", "LC_ALL", "LC_CTYPE"}
 )
+
+# "nobody" — present in essentially every Linux distro, including the
+# python:3.13-slim base image, with no login shell and no meaningful
+# permissions of its own. Used as a numeric id (not the name "nobody") so it
+# doesn't depend on an /etc/passwd entry existing.
+_UNPRIVILEGED_UID = 65534
+_UNPRIVILEGED_GID = 65534
 
 
 def _minimal_subprocess_env() -> dict[str, str]:
-    return {key: value for key, value in os.environ.items() if key.upper() in _SANDBOX_ENV_ALLOWLIST}
+    env = {key: value for key, value in os.environ.items() if key.upper() in _SANDBOX_ENV_ALLOWLIST}
+    # Don't hand the sandboxed process root's own $HOME (/root) — it's about
+    # to run as an unprivileged user that can't write there anyway.
+    env["HOME"] = tempfile.gettempdir()
+    return env
+
+
+def _privilege_drop_kwargs() -> dict[str, Any]:
+    """
+    Extra subprocess.run() kwargs that make the sandboxed subprocess run as
+    an unprivileged user instead of inheriting the backend server's own
+    privileges. Only possible (and only needed) when this process is root,
+    which is the case inside the Docker container — dropping privileges
+    requires starting out privileged enough to do so. A no-op everywhere
+    else (local non-Docker dev, Windows), matching the existing pattern for
+    `resource` limits below.
+
+    `extra_groups=[]` matters as much as `user`/`group` here: without it,
+    the child keeps root's original supplementary group list (which
+    includes gid 0), and since the mounted source tree is group-owned by
+    root, that leftover group-0 membership would let the "unprivileged"
+    process write to it anyway via the group permission bits, not the uid.
+    """
+    if os.name != "posix" or not hasattr(os, "getuid") or os.getuid() != 0:
+        return {}
+    return {"user": _UNPRIVILEGED_UID, "group": _UNPRIVILEGED_GID, "extra_groups": []}
+
 
 # The backend project root (the folder that contains the "app" package).
 # sandbox.py lives at app/services/sandbox.py, so two levels up is the root.
@@ -144,8 +177,10 @@ def run_python_sandbox(
     process (so a crash or infinite loop can't take down the API server),
     enforces a wall-clock timeout, strips the process environment down to a
     safe allow-list (so submitted code can't read JWT_SECRET_KEY,
-    DATABASE_URL, etc. via os.environ), and caps CPU time + memory on POSIX
-    systems. It does not prevent filesystem or network access — a real
+    DATABASE_URL, etc. via os.environ), drops the subprocess to an
+    unprivileged user with no write access to the app's own source tree
+    (inside Docker, where the backend runs as root), and caps CPU time +
+    memory on POSIX systems. It does not prevent network access — a real
     production deployment would add OS-level sandboxing (containers,
     gVisor, seccomp) on top of this.
     """
@@ -168,6 +203,14 @@ def run_python_sandbox(
             encoding="utf-8",
         )
 
+        # The temp dir is created owned-by-root with restrictive default
+        # permissions, but the subprocess is about to run as the
+        # unprivileged "nobody" user — it needs to be able to enter the
+        # directory and read (not write) these two files.
+        os.chmod(tmp_path, 0o755)
+        os.chmod(user_code_path, 0o644)
+        os.chmod(runner_path, 0o644)
+
         try:
             completed = subprocess.run(
                 [sys.executable, str(runner_path)],
@@ -176,6 +219,7 @@ def run_python_sandbox(
                 timeout=timeout_seconds,
                 cwd=tmp_dir,
                 env=_minimal_subprocess_env(),
+                **_privilege_drop_kwargs(),
             )
         except subprocess.TimeoutExpired:
             return SandboxResult(

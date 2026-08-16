@@ -55,7 +55,11 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    # This overrides the Dockerfile's own CMD (compose's `command:` always
+    # wins), so the chmod step that locks down the bind-mounted source tree
+    # for the sandbox's unprivileged user (see backend/Dockerfile and
+    # app/services/sandbox.py) has to be duplicated here to actually run.
+    command: sh -c "chmod -R go-w /app 2>/dev/null || true; exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   # ── Next.js Frontend ────────────────────────────────────────────────────────
   frontend:
