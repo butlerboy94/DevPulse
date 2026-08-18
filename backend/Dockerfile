@@ -17,14 +17,19 @@ COPY . .
 EXPOSE 8000
 
 # `chmod -R go-w /app` strips write access for everyone except the file
-# owner (root) from the whole mounted source tree before the server starts.
-# Needed because docker-compose bind-mounts ./backend over /app for local
-# hot-reload, and Docker Desktop's Windows/macOS bind-mount layer defaults
-# everything to world-writable (777) regardless of what's checked into git —
-# without this, the sandbox subprocess's unprivileged user (see
-# app/services/sandbox.py) would still be able to overwrite the app's own
-# source files despite not being root (the group-owner is also root, so
-# both "group" and "other" write bits have to go, not just "other").
+# owner (root) from the whole copied-in source tree before the server
+# starts. It matters less here than in the local dev setup (this Dockerfile
+# COPYs the code in rather than bind-mounting it, so it isn't world-writable
+# by default the way Docker Desktop's Windows/macOS bind-mount layer makes
+# it) but is kept for defense in depth, since the sandbox subprocess's
+# unprivileged user (see app/services/sandbox.py) should never be able to
+# write to the app's own source regardless of how the image was built.
 # `|| true` so a chmod hiccup never blocks the server from starting.
-# --reload watches for file changes — fine for local dev, not for production.
-CMD ["sh", "-c", "chmod -R go-w /app 2>/dev/null || true; exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+#
+# No --reload here: this is the command a real cloud host (Railway, Render,
+# etc.) runs when it builds and starts the image directly, and --reload's
+# "watch the filesystem and restart on every change" behavior is a dev
+# convenience with no purpose (and a small ongoing cost) in production.
+# Local development still gets hot-reload — docker-compose.yml's own
+# `command:` line overrides this CMD and adds --reload back for that case.
+CMD ["sh", "-c", "chmod -R go-w /app 2>/dev/null || true; exec uvicorn app.main:app --host 0.0.0.0 --port 8000"]

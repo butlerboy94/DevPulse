@@ -18,6 +18,19 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 30
 
+    # Comma-separated list of frontend URLs allowed to call this API (CORS —
+    # Cross-Origin Resource Sharing, the browser's own rule that a webpage
+    # can only talk to a different website if that website explicitly says
+    # "yes, this page is allowed to call me"). Defaults to just the local
+    # Next.js dev server; a real deployment sets ALLOWED_ORIGINS to the
+    # production frontend's URL (e.g. https://devpulse.vercel.app) instead
+    # of needing a code change — see DEPLOYMENT.md.
+    allowed_origins: str = "http://localhost:3000"
+
+    @property
+    def allowed_origins_list(self) -> list[str]:
+        return [origin.strip() for origin in self.allowed_origins.split(",") if origin.strip()]
+
     class Config:
         env_file = ".env"
 

@@ -14,10 +14,12 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Only the local Next.js dev server is allowed to call this API for now.
+# Which frontend URLs are allowed to call this API — read from settings
+# (ALLOWED_ORIGINS env var) instead of hardcoded, so pointing this API at a
+# deployed frontend later is a config change, not a code change.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
