@@ -21,9 +21,6 @@ DevPulse is a full-stack web platform that benchmarks your code's execution spee
 
 <br/>
 
-<!-- TODO: record a demo GIF against the live app and drop it here -->
-<!-- ![DevPulse Demo](./assets/demo.gif) -->
-
 **[Live Demo](https://dev-pulse-rouge.vercel.app)** · **[Report a Bug](https://github.com/butlerboy94/DevPulse/issues)** · **[Request a Feature](https://github.com/butlerboy94/DevPulse/issues)**
 
 </div>
@@ -50,7 +47,7 @@ Under the hood, DevPulse does four things simultaneously:
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                        FRONTEND                              │
-│            Next.js 14 · TypeScript · Tailwind CSS            │
+│            Next.js 16 · TypeScript · Tailwind CSS            │
 │         Monaco Editor · Recharts · Zustand · Axios           │
 └────────────────────────────┬─────────────────────────────────┘
                              │  REST API
@@ -124,7 +121,7 @@ Under the hood, DevPulse does four things simultaneously:
 
 ```
 DevPulse/
-├── frontend/                   # Next.js 14 TypeScript application
+├── frontend/                   # Next.js 16 TypeScript application
 │   ├── app/                    # App Router pages and layouts
 │   ├── components/             # Reusable React components
 │   └── public/                 # Static assets
