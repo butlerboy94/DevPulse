@@ -1,0 +1,117 @@
+# Continuous Integration — runs automatically on every push and pull
+# request to main. Think of this as a tireless QA checker: every time code
+# changes, it spins up fresh copies of everything (a database, Node.js,
+# Python, a C++ compiler) and re-runs the project's own test/build steps
+# from scratch, the same way a new teammate's laptop would need to. If
+# anything breaks, it shows up here — as a red X on the commit — before it
+# ever reaches production.
+#
+# This pipeline does NOT deploy anywhere. It only proves the code is in a
+# working state. See DEPLOYMENT.md for how deployment actually happens.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Backend: FastAPI + Postgres + Alembic + Pytest ──────────────────────
+  backend:
+    runs-on: ubuntu-latest
+
+    # A real, throwaway Postgres database that lives only for this CI run —
+    # the same engine the app uses in production, so a migration or query
+    # that only breaks on Postgres (and happens to work on SQLite) gets
+    # caught here instead of after a real deploy.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: devpulse
+          POSTGRES_PASSWORD: devpulse_ci
+          POSTGRES_DB: devpulse
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U devpulse"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://devpulse:devpulse_ci@localhost:5432/devpulse
+      JWT_SECRET_KEY: ci-test-secret-not-used-anywhere-real
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Apply database migrations
+        working-directory: backend
+        run: python -m alembic upgrade head
+
+      - name: Run tests
+        working-directory: backend
+        run: python -m pytest -q
+
+  # ── Frontend: Next.js build + lint ──────────────────────────────────────
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+  # ── Engine: compile the C++ benchmarking engine ─────────────────────────
+  # Not wired into the backend job above on purpose — the backend already
+  # has a documented, tested fallback to pure-Python timing when this
+  # compiled module isn't present (see backend/app/engine/wrapper.py), so a
+  # broken C++ build should never block the rest of the pipeline. This job
+  # exists purely to prove the engine/ folder's CMake setup still compiles —
+  # something that, before this workflow existed, had never actually been
+  # verified anywhere (see engine/CMakeLists.txt and Phase 2 of CLAUDE.md).
+  engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+
+      - name: Install pybind11
+        run: pip install pybind11
+
+      - name: Configure and build
+        working-directory: engine
+        run: |
+          cmake -B build -DCMAKE_PREFIX_PATH="$(python -m pybind11 --cmakedir)"
+          cmake --build build --config Release
