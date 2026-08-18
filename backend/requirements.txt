@@ -1,5 +1,5 @@
 # Web framework
-fastapi==0.115.5
+fastapi==0.141.1  # bumped from 0.115.5 to pull in a starlette that patches several CVEs
 uvicorn[standard]==0.32.1
 
 # Settings / env
@@ -11,11 +11,20 @@ alembic==1.14.0
 psycopg2-binary==2.9.10
 
 # Auth
-python-jose[cryptography]==3.3.0
+python-jose[cryptography]==3.4.0  # 3.3.0 had known CVEs (PYSEC-2024-232/233, 2025-185)
 passlib[bcrypt]==1.7.4
 bcrypt==4.0.1  # passlib 1.7.4 doesn't know about bcrypt 4.1+'s API changes
-python-multipart==0.0.12
+python-multipart==0.0.32  # 0.0.12 had known CVEs, see pip-audit
 email-validator==2.2.0
+# python-jose pulls in "ecdsa" (for asymmetric JWT algorithms like ES256)
+# and hard-pins "pyasn1<0.5.0" (for parsing RSA/ECDSA key material). Both
+# have known CVEs (ecdsa: PYSEC-2026-1325, a timing attack; pyasn1: several
+# ASN.1-decoding bugs) with no fix python-jose is currently compatible with.
+# Accepted, monitored risk: this app only ever signs/verifies JWTs with
+# HS256 (a symmetric algorithm), so the vulnerable RSA/ECDSA/ASN.1 code
+# paths in both packages are never actually reached by anything this app
+# does. Re-check this note if the app ever adds an asymmetric JWT algorithm,
+# or if python-jose ships a release that relaxes the pyasn1 pin.
 
 # AI
 anthropic==0.40.0
@@ -27,6 +36,6 @@ redis==5.2.0
 httpx==0.28.0
 
 # Testing
-pytest==8.3.4
-pytest-asyncio==0.24.0
+pytest==9.0.3
+pytest-asyncio==1.4.0
 httpx==0.28.0
