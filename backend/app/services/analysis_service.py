@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import secrets
 from dataclasses import asdict
 from datetime import datetime, timezone
 from typing import Any
@@ -53,6 +54,11 @@ def analyze_submission(
         source_code=source_code,
         code_hash=code_hash,
         status="running",
+        # secrets.token_urlsafe (not random.random or uuid4) because it's
+        # built specifically for "generate a string safe to put in a URL
+        # that nobody can guess" — the same tool Python recommends for
+        # password-reset links and API keys.
+        public_token=secrets.token_urlsafe(16),
     )
     db.add(analysis)
     db.commit()

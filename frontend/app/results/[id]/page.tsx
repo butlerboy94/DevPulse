@@ -15,12 +15,11 @@ export default function ResultPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = Number(params.id);
-    if (!Number.isFinite(id)) {
-      setError("Invalid analysis id.");
-      return;
-    }
-    getResult(id)
+    // params.id here is actually the analysis's public_token — the folder
+    // is still named [id] since that's just the URL segment name, but the
+    // value itself is a random string now, not a number (see
+    // backend/app/models/analysis.py's public_token field for why).
+    getResult(params.id)
       .then(setResult)
       .catch((err) => {
         if (axios.isAxiosError(err) && err.response?.status === 403) {
@@ -35,7 +34,9 @@ export default function ResultPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-white mb-6">Analysis #{params.id}</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">
+        {result ? `${result.language} analysis` : "Analysis"}
+      </h1>
       {error && <p className="text-sm text-[#e66767]">{error}</p>}
       {!error && !result && <p className="text-sm text-zinc-500">Loading…</p>}
       {result && <ResultsDashboard result={result} />}

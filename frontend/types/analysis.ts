@@ -122,9 +122,13 @@ export interface AIReport {
   recommendations: AIRecommendation[];
 }
 
-// Response shape for POST /analyze and GET /results/{id}.
+// Response shape for POST /analyze and GET /results/{public_id}.
+//
+// public_id is a random, unguessable string (not the database's own
+// counting-up id) so that anonymous submissions can't be found by anyone
+// just trying nearby numbers in the URL.
 export interface AnalysisOut {
-  id: number;
+  public_id: string;
   language: string;
   status: AnalysisStatus;
   execution_time_ms: number | null;
@@ -142,7 +146,7 @@ export interface AnalysisOut {
 
 // Response shape for one row of GET /history — a trimmed-down AnalysisOut.
 export interface AnalysisHistoryItem {
-  id: number;
+  public_id: string;
   language: string;
   status: AnalysisStatus;
   quality_score: number | null;

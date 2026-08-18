@@ -55,40 +55,45 @@ export default function HistoryPage() {
 
       {items !== null && items.length > 0 && (
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-zinc-500 text-xs border-b border-zinc-800">
-                <th className="px-4 py-2 font-medium">Language</th>
-                <th className="px-4 py-2 font-medium">Status</th>
-                <th className="px-4 py-2 font-medium text-right">Quality</th>
-                <th className="px-4 py-2 font-medium text-right">Execution time</th>
-                <th className="px-4 py-2 font-medium text-right">Submitted</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.id} className="border-t border-zinc-800/60 hover:bg-zinc-800/40">
-                  <td className="px-4 py-2">
-                    <Link href={`/results/${item.id}`} className="text-sky-400 hover:underline">
-                      {item.language}
-                    </Link>
-                  </td>
-                  <td className={`px-4 py-2 ${STATUS_STYLE[item.status] ?? "text-zinc-400"}`}>
-                    {item.status}
-                  </td>
-                  <td className="px-4 py-2 text-right tabular-nums text-zinc-300">
-                    {item.quality_score != null ? item.quality_score.toFixed(0) : "—"}
-                  </td>
-                  <td className="px-4 py-2 text-right tabular-nums text-zinc-300">
-                    {item.execution_time_ms != null ? `${item.execution_time_ms.toFixed(2)} ms` : "—"}
-                  </td>
-                  <td className="px-4 py-2 text-right text-zinc-500">
-                    {new Date(item.created_at).toLocaleString()}
-                  </td>
+          {/* overflow-x-auto lets the table scroll sideways on narrow
+              screens instead of squeezing 5 columns into a phone-width
+              container (same pattern as HotspotTable.tsx) */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-zinc-500 text-xs border-b border-zinc-800">
+                  <th className="px-4 py-2 font-medium">Language</th>
+                  <th className="px-4 py-2 font-medium">Status</th>
+                  <th className="px-4 py-2 font-medium text-right">Quality</th>
+                  <th className="px-4 py-2 font-medium text-right">Execution time</th>
+                  <th className="px-4 py-2 font-medium text-right">Submitted</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.public_id} className="border-t border-zinc-800/60 hover:bg-zinc-800/40">
+                    <td className="px-4 py-2">
+                      <Link href={`/results/${item.public_id}`} className="text-sky-400 hover:underline">
+                        {item.language}
+                      </Link>
+                    </td>
+                    <td className={`px-4 py-2 ${STATUS_STYLE[item.status] ?? "text-zinc-400"}`}>
+                      {item.status}
+                    </td>
+                    <td className="px-4 py-2 text-right tabular-nums text-zinc-300">
+                      {item.quality_score != null ? item.quality_score.toFixed(0) : "—"}
+                    </td>
+                    <td className="px-4 py-2 text-right tabular-nums text-zinc-300">
+                      {item.execution_time_ms != null ? `${item.execution_time_ms.toFixed(2)} ms` : "—"}
+                    </td>
+                    <td className="px-4 py-2 text-right text-zinc-500">
+                      {new Date(item.created_at).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </main>

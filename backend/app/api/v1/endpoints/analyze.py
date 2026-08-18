@@ -38,18 +38,19 @@ def analyze(
     return result
 
 
-@router.get("/results/{analysis_id}", response_model=AnalysisOut)
+@router.get("/results/{public_id}", response_model=AnalysisOut)
 def get_result(
-    analysis_id: int,
+    public_id: str,
     db: Session = Depends(get_db),
     current_user: User | None = Depends(get_current_user_optional),
 ):
     """
-    Fetch a single analysis by id. Anonymous submissions are viewable by
-    anyone with the id; submissions made while logged in are only viewable
-    by their owner.
+    Fetch a single analysis by its public token (a random string, not the
+    sequential database id — see Analysis.public_token for why). Anonymous
+    submissions are viewable by anyone with the token; submissions made
+    while logged in are only viewable by their owner.
     """
-    analysis = db.query(Analysis).filter(Analysis.id == analysis_id).first()
+    analysis = db.query(Analysis).filter(Analysis.public_token == public_id).first()
     if analysis is None:
         raise HTTPException(status_code=404, detail="Analysis not found")
     if analysis.user_id is not None and (current_user is None or current_user.id != analysis.user_id):

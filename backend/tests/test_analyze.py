@@ -28,16 +28,38 @@ def test_get_result_for_anonymous_analysis_is_public(client):
         "/api/v1/analyze",
         json={"language": "python", "source_code": SIMPLE_CODE, "iterations": 2},
     )
-    analysis_id = create_response.json()["id"]
+    public_id = create_response.json()["public_id"]
 
-    response = client.get(f"/api/v1/results/{analysis_id}")
+    response = client.get(f"/api/v1/results/{public_id}")
     assert response.status_code == 200
-    assert response.json()["id"] == analysis_id
+    assert response.json()["public_id"] == public_id
 
 
 def test_get_result_missing_id_returns_404(client):
     response = client.get("/api/v1/results/999999")
     assert response.status_code == 404
+
+
+def test_analysis_ids_are_not_sequentially_guessable(client):
+    # Two different submissions must get two different, non-numeric public
+    # tokens — guards against ever silently falling back to the old
+    # sequential database id, which would reopen the enumeration gap this
+    # endpoint was changed to close.
+    first = client.post(
+        "/api/v1/analyze",
+        json={"language": "python", "source_code": SIMPLE_CODE, "iterations": 2},
+    ).json()
+    second = client.post(
+        "/api/v1/analyze",
+        json={"language": "python", "source_code": SIMPLE_CODE, "iterations": 2},
+    ).json()
+
+    assert first["public_id"] != second["public_id"]
+    assert not first["public_id"].isdigit()
+
+    # Trying to look an anonymous analysis up by a guessed small number
+    # (what the old sequential id would have looked like) must not work.
+    assert client.get("/api/v1/results/1").status_code == 404
 
 
 def test_history_requires_login(client):

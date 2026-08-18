@@ -14,9 +14,14 @@ class AnalyzeRequest(BaseModel):
     iterations: int = Field(default=5, ge=1, le=50, description="How many timed runs to average")
 
 
-# Full response shape for POST /analyze and GET /results/{id}.
+# Full response shape for POST /analyze and GET /results/{public_id}.
+#
+# Note there's no plain integer "id" field here on purpose. The database's
+# own auto-incrementing id (1, 2, 3...) is never sent to the browser — only
+# the random, unguessable "public_token" (renamed to public_id here), so an
+# anonymous submission can't be found by anyone just trying nearby numbers.
 class AnalysisOut(BaseModel):
-    id: int
+    public_id: str = Field(validation_alias="public_token")
     language: str
     status: str
     execution_time_ms: float | None = None
@@ -35,9 +40,10 @@ class AnalysisOut(BaseModel):
         from_attributes = True
 
 
-# Trimmed-down response shape for each row of GET /history.
+# Trimmed-down response shape for each row of GET /history. Same public_id
+# rule as AnalysisOut above — see the comment there.
 class AnalysisHistoryItem(BaseModel):
-    id: int
+    public_id: str = Field(validation_alias="public_token")
     language: str
     status: str
     quality_score: float | None = None

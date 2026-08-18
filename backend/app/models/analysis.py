@@ -14,6 +14,16 @@ class Analysis(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
 
+    # A random, unguessable id (22 random characters) used in the public
+    # /results/{public_token} URL instead of the plain database id above.
+    # The database id counts up one at a time (1, 2, 3...), so if it were
+    # used in the URL, anyone could "walk" through every submission anyone
+    # has ever made — like a hotel handing out room numbers in order instead
+    # of a keycard, letting a stranger just try every door down the hall.
+    # This token is generated once per row (see analysis_service.py) and
+    # never reused, so guessing it is practically impossible.
+    public_token = Column(String(22), unique=True, index=True, nullable=False)
+
     # Submitted code
     language = Column(String(20), nullable=False)          # python | cpp | javascript
     source_code = Column(Text, nullable=False)
