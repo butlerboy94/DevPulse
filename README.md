@@ -207,7 +207,7 @@ cmake -B build && cmake --build build
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/api/v1/analyze` | Submit code for full analysis |
-| `GET` | `/api/v1/results/{id}` | Retrieve a specific analysis result |
+| `GET` | `/api/v1/results/{public_id}` | Retrieve a specific analysis result by its public token |
 | `GET` | `/api/v1/history` | Get all past analyses for current user |
 | `POST` | `/api/v1/auth/register` | Create a new user account |
 | `POST` | `/api/v1/auth/login` | Log in and receive a JWT token |
@@ -222,8 +222,8 @@ Full interactive API documentation available at `/docs` (Swagger UI) when runnin
 - [x] **Phase 1** — Initialize monorepo, Docker, FastAPI and Next.js skeletons
 - [x] **Phase 2** — C++ benchmarking engine with pybind11 bindings
 - [x] **Phase 3** — Python backend, static analysis, AI integration, database
-- [x] **Phase 4** — Frontend: code editor, dashboard, auth, history (mobile nav polish still in progress)
-- [ ] **Phase 5** — CI/CD pipeline, cloud deployment, live demo URL
+- [x] **Phase 4** — Frontend: code editor, dashboard, auth, history, mobile nav
+- [ ] **Phase 5** — CI pipeline done ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)); cloud deployment not yet live — see [`DEPLOYMENT.md`](DEPLOYMENT.md) for the runbook
 
 ---
 
