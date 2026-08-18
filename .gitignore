@@ -82,7 +82,12 @@ dist/
 build/
 eggs/
 .eggs/
-lib/
+# Anchored to the repo root (leading /) — an un-anchored "lib/" here would
+# also match frontend/lib/, which is real hand-written source code (the
+# Axios API client, the Zustand auth store), not a Python build artifact.
+# This is what silently kept those two files out of every commit until
+# Session 7 caught it.
+/lib/
 lib64/
 parts/
 sdist/
