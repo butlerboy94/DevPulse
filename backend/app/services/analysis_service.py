@@ -102,6 +102,18 @@ def analyze_submission(
         except AIRecommendationError as exc:
             ai_report = None
             raw_results["ai_error"] = str(exc)
+        except Exception as exc:
+            # Anything else — a bad API key, an SDK/API shape mismatch, a
+            # malformed response — is still "the AI step failed," not "the
+            # whole analysis failed." Catching only AIRecommendationError
+            # here left a real gap: an unexpected error type would escape
+            # this function entirely and hit the broad `except Exception`
+            # below, which throws away the benchmark and static-analysis
+            # results that had already succeeded, along with everything in
+            # `raw_results` — the AI step becoming non-optional exactly in
+            # the situation it's supposed to be safely skippable.
+            ai_report = None
+            raw_results["ai_error"] = f"{type(exc).__name__}: {exc}"
 
         if ai_report is not None:
             analysis.ai_recommendations = {
