@@ -21,10 +21,10 @@ DevPulse is a full-stack web platform that benchmarks your code's execution spee
 
 <br/>
 
-<!-- Replace with actual demo GIF once deployed -->
+<!-- TODO: record a demo GIF against the live app and drop it here -->
 <!-- ![DevPulse Demo](./assets/demo.gif) -->
 
-**[Live Demo](#)** · **[Report a Bug](#)** · **[Request a Feature](#)**
+**[Live Demo](https://dev-pulse-rouge.vercel.app)** · **[Report a Bug](https://github.com/butlerboy94/DevPulse/issues)** · **[Request a Feature](https://github.com/butlerboy94/DevPulse/issues)**
 
 </div>
 
@@ -161,7 +161,7 @@ DevPulse/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/DevPulse.git
+git clone https://github.com/butlerboy94/DevPulse.git
 cd DevPulse
 ```
 
@@ -212,7 +212,7 @@ cmake -B build && cmake --build build
 | `POST` | `/api/v1/auth/register` | Create a new user account |
 | `POST` | `/api/v1/auth/login` | Log in and receive a JWT token |
 
-Full interactive API documentation available at `/docs` (Swagger UI) when running locally.
+Full interactive API documentation available at `/docs` (Swagger UI) — locally at `http://localhost:8000/docs`, or live at [devpulse-production-7dfc.up.railway.app/docs](https://devpulse-production-7dfc.up.railway.app/docs).
 
 ---
 
@@ -223,7 +223,7 @@ Full interactive API documentation available at `/docs` (Swagger UI) when runnin
 - [x] **Phase 2** — C++ benchmarking engine with pybind11 bindings
 - [x] **Phase 3** — Python backend, static analysis, AI integration, database
 - [x] **Phase 4** — Frontend: code editor, dashboard, auth, history, mobile nav
-- [ ] **Phase 5** — CI pipeline done ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)); cloud deployment not yet live — see [`DEPLOYMENT.md`](DEPLOYMENT.md) for the runbook
+- [x] **Phase 5** — CI pipeline ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) + live deployment — frontend on Vercel, backend + Postgres on Railway (see [`DEPLOYMENT.md`](DEPLOYMENT.md) for how)
 
 ---
 
